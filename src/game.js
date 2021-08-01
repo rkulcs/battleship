@@ -21,11 +21,13 @@ const initializePlayers = () => {
 
 const gameLoop = () => {
   const entities = initializePlayers();
-
   const player = entities.player;
   const ai = entities.ai;
+  const playerBoard = entities.playerBoard;
+  const aiBoard = entities.aiBoard;
 
-  console.log('test');
+  const playerTiles = playerBoard.render(document.getElementById('ship-board'));
+  const aiTiles = aiBoard.render(document.getElementById('target-board'));
 };
 
 module.exports = gameLoop;
