@@ -22,8 +22,12 @@ const GameBoard = () => {
 
   const ships = [];
 
+  //--- Getters ---//
+
   const getTiles = () => tilesHit;
   const getShips = () => ships;
+
+  //--- Instance methods ---//
 
   /**
    * Adds the given ship to the gameboard.
@@ -42,10 +46,13 @@ const GameBoard = () => {
    */
   const strike = (x, y) => {
     getTiles()[y][x] = true;
+    let struckShip = false;
 
     for (let i = 0; i < getShips().length; i++) {
-      getShips()[i].hit(x, y);
+      if (getShips()[i].hit(x, y)) struckShip = true;
     }
+
+    return struckShip;
   };
 
   /**
@@ -59,6 +66,30 @@ const GameBoard = () => {
     }
 
     return true;
+  };
+
+  /**
+   * Sets the event listeners of the given game board tile.
+   * 
+   * @param {HTMLElement} tile The tile to which the event listeners will be added
+   * @param {string} boardID The ID of the board
+   * @param {number} x The x-coordinate of the tile
+   * @param {number} y The y-coordinate of the tile
+   */
+  const setEventListeners = (tile, boardID, x, y) => {
+    if (boardID === 'ship-board') {
+
+    } else {
+      tile.addEventListener('click', () => {
+        tile.classList.remove('active-tile');
+    
+        if (strike(x, y)) {
+          tile.classList.add('ship-tile');
+        } else {
+          tile.classList.add('shipless-tile');
+        }
+      });
+    }
   };
 
   /**
@@ -81,11 +112,7 @@ const GameBoard = () => {
         tile.classList.add('active-tile');
         tile.innerHTML = '\u00B7';
 
-        // TODO: Update the tile on click
-        tile.addEventListener('click', () => {
-          tile.classList.remove('active-tile');
-        });
-
+        setEventListeners(tile, boardDiv.id, x, y);
         boardDiv.appendChild(tile);
       }
     }

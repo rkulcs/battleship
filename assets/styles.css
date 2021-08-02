@@ -42,3 +42,11 @@ body {
 .active-tile {
     cursor: pointer;
 }
+
+.ship-tile {
+    color: rgb(202, 5, 5);
+}
+
+.shipless-tile {
+    color: rgb(255, 255, 255);
+}

@@ -36,17 +36,23 @@ const Ship = (x, y, length, placement) => {
    * 
    * @param {*} x The x-coordinate of the missile
    * @param {*} y The y-coordinate of the missile
+   * 
+   * @returns True if the ship was hit, false otherwise
    */
   const hit = (x, y) => {
     if (getPlacement() === shipPlacement.HORIZONTAL) {
       if ((x >= getX()) && (x < (getX() + getLength())) && (y === getY())) {
         getPartsHit()[x - getX()] = true;
+        return true;
       }
     } else {
       if ((y >= getY()) && (y < (getY() + getLength())) && (x === getX())) {
         getPartsHit()[y - getY()] = true;
+        return true;
       }
     }
+
+    return false;
   };
 
   /**
