@@ -50,3 +50,7 @@ body {
 .shipless-tile {
     color: rgb(255, 255, 255);
 }
+
+.contains-ship {
+    background-color: rgb(70, 70, 70);
+}

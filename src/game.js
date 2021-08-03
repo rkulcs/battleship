@@ -32,7 +32,8 @@ const gameLoop = () => {
 
   // TODO: Remove this ship after testing
   aiBoard.addShip(ship.Ship(0, 0, 3, ship.shipPlacement.HORIZONTAL));
-  console.log(aiBoard.getShips());
+  
+  playerBoard.renderShipPlacement(playerTiles);
 };
 
 module.exports = gameLoop;

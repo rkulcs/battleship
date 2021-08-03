@@ -14,10 +14,19 @@ const shipPlacement = {
  * @returns A new instance of Ship
  */
 const Ship = (x, y, length, placement) => {
-  const getX = () => x;
-  const getY = () => y;
+  let xCoord = x;
+  let yCoord = y;
+  let orientation = placement;
+
+  const getX = () => xCoord;
+  const setX = (newX) => xCoord = newX;
+  const getY = () => yCoord;
+  const setY = (newY) => yCoord = newY;
+
   const getLength = () => length;
-  const getPlacement = () => placement;
+
+  const getPlacement = () => orientation;
+  const setPlacement = (newOrientation) => orientation = newOrientation;
 
   const partsHit = (() => {
     const parts = [];
@@ -68,14 +77,60 @@ const Ship = (x, y, length, placement) => {
     return true;
   };
 
+  /**
+   * Renders the ship on the game board.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles of the game board
+   * 
+   * @returns An array of tiles which contain the ship
+   */
+  const render = (boardTiles) => {
+    if ((getPlacement() === shipPlacement.HORIZONTAL) 
+        && (getX() + getLength() - 1 > 9)) return;
+    if ((getPlacement() === shipPlacement.VERTICAL) 
+        && (getY() + getLength() - 1 > 9)) return;
+
+    const occupiedTiles = [];
+
+    for (let i = 0; i < getLength(); i++) {
+      if (getPlacement() === shipPlacement.HORIZONTAL) {
+        occupiedTiles.push(boardTiles[getY()][getX() + i]);
+      } else {
+        occupiedTiles.push(boardTiles[getY() + i][getX()]);
+      }
+    }
+
+    for (let i = 0; i < occupiedTiles.length; i++) {
+      occupiedTiles[i].classList.add('contains-ship');
+    }
+
+    return occupiedTiles;
+  };
+
+  /**
+   * Removes the rendered ship from the game board.
+   * 
+   * @param {HTMLElement[]} occupiedTiles The tiles which contain the ship
+   */
+  const clear = (occupiedTiles) => {
+    for (let i = 0; i < occupiedTiles.length; i++) {
+      occupiedTiles[i].classList.remove('contains-ship');
+    }
+  };
+
   return {
     getX,
+    setX,
     getY,
+    setY,
     getLength,
     getPlacement,
+    setPlacement,
     getPartsHit,
     hit,
     isSunk,
+    render,
+    clear
   };
 };
 

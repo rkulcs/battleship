@@ -1,3 +1,5 @@
+const ship = require('./ship');
+
 const SIZE = 10;
 
 /**
@@ -120,13 +122,96 @@ const GameBoard = () => {
     return tiles;
   };
 
+  /**
+   * Generates the ships of one player.
+   * 
+   * @returns An array of ship names and Ship instances.
+   */
+  const createShips = () => {
+    return [
+      {name: 'carrier',    
+       obj: ship.Ship(undefined, undefined, 5, ship.shipPlacement.HORIZONTAL)},
+      {name: 'battleship',
+       obj: ship.Ship(undefined, undefined, 4, ship.shipPlacement.HORIZONTAL)},
+      {name: 'cruiser',
+       obj: ship.Ship(undefined, undefined, 3, ship.shipPlacement.HORIZONTAL)},
+      {name: 'submarine',
+       obj: ship.Ship(undefined, undefined, 3, ship.shipPlacement.HORIZONTAL)},
+      {name: 'destroyer',
+       obj: ship.Ship(undefined, undefined, 2, ship.shipPlacement.HORIZONTAL)}
+    ];
+  }
+
+  /**
+   * Adds event listeners to the game board for the ship placement stage of
+   * the game.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles to which the event listeners
+   *                                   will be added
+   * @param {Ship} ship The ship which may be rendered onto or added to the
+   *                    tiles of the game board
+   */
+  const setShipPlacementEventListeners = (boardTiles, currentShip) => {
+    let occupiedTiles;
+
+    // Change the orientation of the ship when the spacebar is pressed
+    window.addEventListener('keypress', (e) => {
+      if (e.keyCode === KeyboardEvent.DOM_VK_SPACE) {
+        if (currentShip.getPlacement() === ship.shipPlacement.HORIZONTAL) {
+          currentShip.setPlacement(ship.shipPlacement.VERTICAL);
+        } else {
+          currentShip.setPlacement(ship.shipPlacement.HORIZONTAL);
+        }
+      }
+
+      if (currentShip.getX() !== undefined && currentShip.getY() !== undefined) {
+        currentShip.clear(occupiedTiles);
+        occupiedTiles = currentShip.render(boardTiles);
+      }
+    });
+
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        let tile = boardTiles[y][x];
+
+        tile.addEventListener('mouseover', () => {
+          currentShip.setX(x);
+          currentShip.setY(y);
+          occupiedTiles = currentShip.render(boardTiles);
+        });
+
+        tile.addEventListener('mouseout', () => {
+          if (occupiedTiles !== undefined) currentShip.clear(occupiedTiles);
+        });
+      }
+    }
+  };
+
+  /**
+   * Renders the ship placement process until all ships have been placed onto
+   * the board.
+   * @param {HTMLElement[][]} boardTiles The tiles of the game board
+   */
+  const renderShipPlacement = (boardTiles) => {
+    const shipsRemaining = createShips();
+
+    // while (shipsRemaining.length !== 0) {
+    //   let currentShip = shipsRemaining.pop();
+    //   setShipPlacementEventListeners(boardTiles, currentShip);
+    // }
+
+    let currentShip = shipsRemaining.pop();
+    setShipPlacementEventListeners(boardTiles, currentShip.obj);
+  }
+
   return {
     getTiles,
     getShips,
     addShip,
     strike,
     allShipsSunk,
-    render
+    render,
+    renderShipPlacement
   };
 };
 
