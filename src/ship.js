@@ -41,6 +41,27 @@ const Ship = (x, y, length, placement) => {
   const getPartsHit = () => partsHit;
 
   /**
+   * Determines whether the ship covers the specified coordinates
+   * 
+   * @param {number} x The x-coordinate
+   * @param {number} y The y-coordinate
+   * @returns True if the ship is on the given coordinates, false otherwise
+   */
+  const coversCoordinates = (x, y) => {
+    if (getPlacement() === shipPlacement.HORIZONTAL) {
+      if ((x >= getX()) && (x < (getX() + getLength())) && (y === getY())) {
+        return true;
+      }
+    } else {
+      if ((y >= getY()) && (y < (getY() + getLength())) && (x === getX())) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Hits the part of the ship which is located at the given coordinates.
    * 
    * @param {*} x The x-coordinate of the missile
@@ -49,13 +70,11 @@ const Ship = (x, y, length, placement) => {
    * @returns True if the ship was hit, false otherwise
    */
   const hit = (x, y) => {
-    if (getPlacement() === shipPlacement.HORIZONTAL) {
-      if ((x >= getX()) && (x < (getX() + getLength())) && (y === getY())) {
+    if (coversCoordinates(x, y)) {
+      if (getPlacement() === shipPlacement.HORIZONTAL) {
         getPartsHit()[x - getX()] = true;
         return true;
-      }
-    } else {
-      if ((y >= getY()) && (y < (getY() + getLength())) && (x === getX())) {
+      } else {
         getPartsHit()[y - getY()] = true;
         return true;
       }
@@ -78,13 +97,14 @@ const Ship = (x, y, length, placement) => {
   };
 
   /**
-   * Renders the ship on the game board.
+   * Renders the ship on the game board on a temporary or permanent basis.
    * 
    * @param {HTMLElement[][]} boardTiles The tiles of the game board
+   * @param {string} renderType Temporary or permanent addition to the board
    * 
    * @returns An array of tiles which contain the ship
    */
-  const render = (boardTiles) => {
+  const render = (boardTiles, renderType) => {
     if ((getPlacement() === shipPlacement.HORIZONTAL) 
         && (getX() + getLength() - 1 > 9)) return;
     if ((getPlacement() === shipPlacement.VERTICAL) 
@@ -101,10 +121,34 @@ const Ship = (x, y, length, placement) => {
     }
 
     for (let i = 0; i < occupiedTiles.length; i++) {
-      occupiedTiles[i].classList.add('contains-ship');
+      occupiedTiles[i].classList.add(renderType);
     }
 
     return occupiedTiles;
+  };
+
+  /**
+   * Renders the outline of the ship onto the game board. This outline may be
+   * removed using the clear method.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles of the game board
+   * 
+   * @returns The tiles occupied by the outline of the ship
+   */
+  const renderTemporarily = (boardTiles) => {
+    return render(boardTiles, 'temp-ship');
+  };
+
+  /**
+   * Permanently renders the ship onto the game board. Cannot be removed with 
+   * the clear method.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles of the game board
+   * 
+   * @returns The tiles occupied by the ship
+   */
+  const renderPermanently = (boardTiles) => {
+    return render(boardTiles, 'permanent-ship');
   };
 
   /**
@@ -114,8 +158,24 @@ const Ship = (x, y, length, placement) => {
    */
   const clear = (occupiedTiles) => {
     for (let i = 0; i < occupiedTiles.length; i++) {
-      occupiedTiles[i].classList.remove('contains-ship');
+      occupiedTiles[i].classList.remove('temp-ship');
     }
+  };
+
+  /**
+   * Checks whether the tiles occupied by the ship already contain another ship.
+   * 
+   * @param {HTMLElement[]} shipTiles The tiles to be checked
+   * 
+   * @returns True if at least one of the tiles contains another ship, false
+   *          otherwise
+   */
+  const coversAnotherShip = (shipTiles) => {
+    for (let i = 0; i < shipTiles.length; i++) {
+      if (shipTiles[i].classList.contains('permanent-ship')) return true;
+    }
+    
+    return false;
   };
 
   return {
@@ -127,10 +187,13 @@ const Ship = (x, y, length, placement) => {
     getPlacement,
     setPlacement,
     getPartsHit,
+    coversCoordinates,
     hit,
     isSunk,
-    render,
-    clear
+    renderTemporarily,
+    renderPermanently,
+    clear,
+    coversAnotherShip
   };
 };
 

@@ -3,6 +3,71 @@ const ship = require('./ship');
 const SIZE = 10;
 
 /**
+ * Renders the outline of the given ship onto the game board at the specified 
+ * coordinates.
+ * 
+ * @param {Ship} currentShip The ship to be rendered
+ * @param {number} x The x-coordinate
+ * @param {number} y The y-coordinate
+ * @param {HTMLElement[][]} boardTiles The tiles of the game board
+ * 
+ * @returns Nothing if the ship is undefined, the tiles which contain the ship
+ *          otherwise
+ */
+const renderShip = (currentShip, x, y, boardTiles) => {
+  if (currentShip === undefined) return;
+
+  currentShip.setX(x);
+  currentShip.setY(y);
+  return currentShip.renderTemporarily(boardTiles);
+};
+
+/**
+ * Clears a temporarily rendered ship outline from the game board.
+ * 
+ * @param {Ship} currentShip The ship whose outline will be removed
+ * @param {HTMLElement[]} occupiedTiles The tiles which contain the ship
+ * 
+ * @returns An empty array which will replace the value of occupiedTiles
+ */
+const clearShip = (currentShip, occupiedTiles) => {
+  if (currentShip === undefined) return;
+
+  if (occupiedTiles !== undefined) currentShip.clear(occupiedTiles);
+
+  return [];
+};
+
+/**
+ * Changes the orientation of the given ship if the spacebar is pressed.
+ * 
+ * @param {KeyboardEvent} e The keyboard event
+ * @param {Ship} currentShip The ship whose orientation is to be changed
+ * @param {HTMLElement[]} occupiedTiles The tiles occupied by the ship
+ * @param {HTMLElement[][]} boardTiles The tiles of the game board
+ * 
+ * @returns The new tiles occupied by the ship
+ */
+const changeShipOrientation = (e, currentShip, occupiedTiles, boardTiles) => {
+  if (currentShip === undefined) return;
+
+  if (e.keyCode === KeyboardEvent.DOM_VK_SPACE) {
+    if (currentShip.getPlacement() === ship.shipPlacement.HORIZONTAL) {
+      currentShip.setPlacement(ship.shipPlacement.VERTICAL);
+    } else {
+      currentShip.setPlacement(ship.shipPlacement.HORIZONTAL);
+    }
+  }
+
+  if (currentShip.getX() !== undefined && currentShip.getY() !== undefined) {
+    currentShip.clear(occupiedTiles);
+    return currentShip.renderTemporarily(boardTiles);
+  } else {
+    return occupiedTiles;
+  }
+};
+
+/**
  * Represents the gameboard onto which the ships are placed.
  * 
  * @returns A new instance of GameBoard
@@ -148,26 +213,16 @@ const GameBoard = () => {
    * 
    * @param {HTMLElement[][]} boardTiles The tiles to which the event listeners
    *                                   will be added
-   * @param {Ship} ship The ship which may be rendered onto or added to the
-   *                    tiles of the game board
+   * @param {Ship} shipsRemaining The ships to be added to the game board
    */
-  const setShipPlacementEventListeners = (boardTiles, currentShip) => {
+  const setShipPlacementEventListeners = (boardTiles, shipsRemaining) => {
+    let currentShip = shipsRemaining.pop().obj;
     let occupiedTiles;
 
     // Change the orientation of the ship when the spacebar is pressed
     window.addEventListener('keypress', (e) => {
-      if (e.keyCode === KeyboardEvent.DOM_VK_SPACE) {
-        if (currentShip.getPlacement() === ship.shipPlacement.HORIZONTAL) {
-          currentShip.setPlacement(ship.shipPlacement.VERTICAL);
-        } else {
-          currentShip.setPlacement(ship.shipPlacement.HORIZONTAL);
-        }
-      }
-
-      if (currentShip.getX() !== undefined && currentShip.getY() !== undefined) {
-        currentShip.clear(occupiedTiles);
-        occupiedTiles = currentShip.render(boardTiles);
-      }
+      occupiedTiles = changeShipOrientation(e, currentShip, occupiedTiles,
+                                            boardTiles);
     });
 
     for (let y = 0; y < SIZE; y++) {
@@ -175,14 +230,42 @@ const GameBoard = () => {
         let tile = boardTiles[y][x];
 
         tile.addEventListener('mouseover', () => {
-          currentShip.setX(x);
-          currentShip.setY(y);
-          occupiedTiles = currentShip.render(boardTiles);
+          occupiedTiles = renderShip(currentShip, x, y, boardTiles);
         });
 
         tile.addEventListener('mouseout', () => {
-          if (occupiedTiles !== undefined) currentShip.clear(occupiedTiles);
+          occupiedTiles = clearShip(currentShip, occupiedTiles);
         });
+
+        tile.addEventListener('click', () => {
+          if (currentShip === undefined) return;
+          if (currentShip.coversAnotherShip(occupiedTiles)) return;
+
+          addShip(currentShip);
+          currentShip.renderPermanently(boardTiles);
+          
+          if (shipsRemaining.length !== 0) {
+            currentShip = shipsRemaining.pop().obj;
+            currentShip.setX(x);
+            currentShip.setY(y);
+          } else {
+            currentShip = undefined;
+            deactivateTiles(boardTiles);
+          }
+        });
+      }
+    }
+  };
+
+  /**
+   * Removes the active-tile class from all board tiles.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles whose class list will be changed
+   */
+  const deactivateTiles = (boardTiles) => {
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        boardTiles[y][x].classList.remove('active-tile');
       }
     }
   };
@@ -193,16 +276,8 @@ const GameBoard = () => {
    * @param {HTMLElement[][]} boardTiles The tiles of the game board
    */
   const renderShipPlacement = (boardTiles) => {
-    const shipsRemaining = createShips();
-
-    // while (shipsRemaining.length !== 0) {
-    //   let currentShip = shipsRemaining.pop();
-    //   setShipPlacementEventListeners(boardTiles, currentShip);
-    // }
-
-    let currentShip = shipsRemaining.pop();
-    setShipPlacementEventListeners(boardTiles, currentShip.obj);
-  }
+    setShipPlacementEventListeners(boardTiles, createShips());
+  };
 
   return {
     getTiles,

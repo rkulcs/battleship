@@ -60,3 +60,10 @@ test('Ship is not declared sunk when not all of its parts are hit', () => {
     return testShip.isSunk();
   })()).toBeFalsy();
 });
+
+test('Correctly determines that the ship covers a pair of coordinates', () => {
+  expect((() => {
+    let testShip = ship.Ship(4, 4, 5, ship.shipPlacement.HORIZONTAL);
+    return testShip.coversCoordinates(4, 4);
+  })).toBeTruthy();
+})
