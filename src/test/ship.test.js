@@ -66,4 +66,46 @@ test('Correctly determines that the ship covers a pair of coordinates', () => {
     let testShip = ship.Ship(4, 4, 5, ship.shipPlacement.HORIZONTAL);
     return testShip.coversCoordinates(4, 4);
   })).toBeTruthy();
-})
+});
+
+test('Correctly determines that two ships are overlapping', () => {
+  expect((() => {
+    let ship1 = ship.Ship(1, 1, 5, ship.shipPlacement.HORIZONTAL);
+    let ship2 = ship.Ship(1, 1, 5, ship.shipPlacement.VERTICAL);
+
+    return ship1.overlapsWithShip(ship2);
+  })()).toBeTruthy();
+});
+
+test('Correctly determines that two ships are not overlapping', () => {
+  expect((() => {
+    let ship1 = ship.Ship(1, 1, 5, ship.shipPlacement.HORIZONTAL);
+    let ship2 = ship.Ship(1, 2, 5, ship.shipPlacement.VERTICAL);
+
+    return ship1.overlapsWithShip(ship2);
+  })()).toBeFalsy();
+});
+
+test('Correctly determines that the location of a ship is valid', () => {
+  expect((() => {
+    let ship1 = ship.Ship(1, 1, 5, ship.shipPlacement.HORIZONTAL);
+    let ship2 = ship.Ship(1, 2, 5, ship.shipPlacement.VERTICAL);
+    let otherShips = [ship1, ship2];
+
+    let ship3 = ship.Ship(4, 3, 2, ship.shipPlacement.VERTICAL);
+
+    return ship3.validLocation(otherShips);
+  })()).toBeTruthy();
+});
+
+test('Correctly determines that the location of a ship is invalid', () => {
+  expect((() => {
+    let ship1 = ship.Ship(1, 1, 5, ship.shipPlacement.HORIZONTAL);
+    let ship2 = ship.Ship(1, 2, 5, ship.shipPlacement.VERTICAL);
+    let otherShips = [ship1, ship2];
+
+    let ship3 = ship.Ship(3, 1, 2, ship.shipPlacement.VERTICAL);
+
+    return ship3.validLocation(otherShips);
+  })()).toBeFalsy();
+});

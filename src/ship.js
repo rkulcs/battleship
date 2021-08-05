@@ -178,6 +178,49 @@ const Ship = (x, y, length, placement) => {
     return false;
   };
 
+  /**
+   * Determines if the calling instance of Ship overlaps with another ship.
+   * 
+   * @param {Ship} otherShip The other ship which may overlap with the calling
+   *                         instance of Ship
+   * 
+   * @returns True if the two ships overlap, false otherwise
+   */
+  const overlapsWithShip = (otherShip) => {
+    if (getPlacement() === shipPlacement.HORIZONTAL) {
+      let y = getY();
+      let limit = getX() + getLength();
+
+      for (let x = getX(); x < limit; x++) {
+        if (otherShip.coversCoordinates(x, y)) return true;
+      }
+    } else {
+      let x = getX();
+      let limit = getY() + getLength();
+
+      for (let y = getY(); y < limit; y++) {
+        if (otherShip.coversCoordinates(x, y)) return true;
+      }
+    }
+
+    return false;
+  };
+
+  /**
+   * Determines if the current location of the ship is valid.
+   * 
+   * @param {Ship[]} otherShips The other ships on the game board
+   * 
+   * @returns True if the location is valid, false otherwise
+   */
+  const validLocation = (otherShips) => {
+    for (let i = 0; i < otherShips.length; i++) {
+      if (overlapsWithShip(otherShips[i])) return false;
+    }
+
+    return true;
+  };
+
   return {
     getX,
     setX,
@@ -193,7 +236,9 @@ const Ship = (x, y, length, placement) => {
     renderTemporarily,
     renderPermanently,
     clear,
-    coversAnotherShip
+    coversAnotherShip,
+    overlapsWithShip,
+    validLocation
   };
 };
 
