@@ -214,6 +214,11 @@ const Ship = (x, y, length, placement) => {
    * @returns True if the location is valid, false otherwise
    */
   const validLocation = (otherShips) => {
+    if ((getPlacement() === shipPlacement.HORIZONTAL) 
+        && (getX() + getLength() - 1 > 9)) return false;
+    if ((getPlacement() === shipPlacement.VERTICAL) 
+        && (getY() + getLength() - 1 > 9)) return false;
+
     for (let i = 0; i < otherShips.length; i++) {
       if (overlapsWithShip(otherShips[i])) return false;
     }

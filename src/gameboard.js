@@ -106,6 +106,13 @@ const GameBoard = () => {
   };
 
   /**
+   * Removes all ships from the game board.
+   */
+  const removeShips = () => {
+    ships = [];
+  };
+
+  /**
    * Launches a missile towards the given coordinates of the board.
    * 
    * @param {number} x The x-coordinate of the missile
@@ -283,9 +290,11 @@ const GameBoard = () => {
     getTiles,
     getShips,
     addShip,
+    removeShips,
     strike,
     allShipsSunk,
     render,
+    createShips,
     renderShipPlacement
   };
 };
