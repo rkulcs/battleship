@@ -29,12 +29,14 @@ const gameLoop = () => {
 
   const playerTiles = playerBoard.render(document.getElementById('ship-board'));
   const aiTiles = aiBoard.render(document.getElementById('target-board'));
+  aiBoard.deactivateTiles(aiTiles);
 
-  // // TODO: Remove this ship after testing
-  // aiBoard.addShip(ship.Ship(0, 0, 3, ship.shipPlacement.HORIZONTAL));
-  
   playerBoard.renderShipPlacement(playerTiles);
+
   ai.aiPlaceShips();
+
+  aiBoard.setTargetBoardTiles(aiTiles, playerTiles, ai, player);
+  aiBoard.activateTiles(aiTiles);
 };
 
 module.exports = gameLoop;

@@ -142,27 +142,69 @@ const GameBoard = () => {
     return true;
   };
 
-  /**
-   * Sets the event listeners of the given game board tile.
-   * 
-   * @param {HTMLElement} tile The tile to which the event listeners will be added
-   * @param {string} boardID The ID of the board
-   * @param {number} x The x-coordinate of the tile
-   * @param {number} y The y-coordinate of the tile
-   */
-  const setEventListeners = (tile, boardID, x, y) => {
-    if (boardID === 'ship-board') {
 
-    } else {
-      tile.addEventListener('click', () => {
-        tile.classList.remove('active-tile');
-    
-        if (strike(x, y)) {
-          tile.classList.add('ship-tile');
-        } else {
-          tile.classList.add('shipless-tile');
+  /**
+   * Sets up the event listeners of the tiles of the target board.
+   * 
+   * @param {HTMLElement[][]} aiTiles The target board
+   * @param {HTMLElement[][]} playerTiles The ship board
+   * @param {Player} ai The Player instance representing the AI
+   * @param {Player} player The Player instance representing the user
+   */
+  const setTargetBoardTiles = (aiTiles, playerTiles, ai, player) => {
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        let tile = aiTiles[y][x];
+
+        tile.addEventListener('click', () => {
+          if (!tile.classList.contains('active-tile')) return;
+  
+          tile.classList.remove('active-tile');
+      
+          if (strike(x, y)) {
+            tile.classList.add('ship-tile');
+          } else {
+            tile.classList.add('shipless-tile');
+          }
+
+          let aiCoords = ai.aiMove();
+
+          if (player.getShipBoard().strike(aiCoords.x, aiCoords.y)) {
+            playerTiles[aiCoords.y][aiCoords.x].classList.add('ship-tile');
+          } else {
+            playerTiles[aiCoords.y][aiCoords.x].classList.add('shipless-tile');
+          }
+        });
+      }
+    }
+  };
+
+  const activateTiles = (boardTiles) => {
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        let tile = boardTiles[y][x];
+
+        if (!tile.classList.contains('ship-tile') 
+            && !tile.classList.contains('shipless-tile'))
+          tile.classList.add('active-tile');
+      }
+    }
+  };
+
+  /**
+   * Removes the active-tile class from all board tiles.
+   * 
+   * @param {HTMLElement[][]} boardTiles The tiles whose class list will be changed
+   */
+  const deactivateTiles = (boardTiles) => {
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        let tile = boardTiles[y][x];
+
+        if (tile.classList.contains('active-tile')) {
+          tile.classList.remove('active-tile');
         }
-      });
+      }
     }
   };
 
@@ -185,8 +227,6 @@ const GameBoard = () => {
         tile.className = 'tile';
         tile.classList.add('active-tile');
         tile.innerHTML = '\u00B7';
-
-        setEventListeners(tile, boardDiv.id, x, y);
         boardDiv.appendChild(tile);
       }
     }
@@ -265,19 +305,6 @@ const GameBoard = () => {
   };
 
   /**
-   * Removes the active-tile class from all board tiles.
-   * 
-   * @param {HTMLElement[][]} boardTiles The tiles whose class list will be changed
-   */
-  const deactivateTiles = (boardTiles) => {
-    for (let y = 0; y < SIZE; y++) {
-      for (let x = 0; x < SIZE; x++) {
-        boardTiles[y][x].classList.remove('active-tile');
-      }
-    }
-  };
-
-  /**
    * Renders the ship placement process until all ships have been placed onto
    * the board.
    * @param {HTMLElement[][]} boardTiles The tiles of the game board
@@ -293,6 +320,9 @@ const GameBoard = () => {
     removeShips,
     strike,
     allShipsSunk,
+    setTargetBoardTiles,
+    activateTiles,
+    deactivateTiles,
     render,
     createShips,
     renderShipPlacement

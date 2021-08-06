@@ -20,12 +20,22 @@ const Player = (shipBoard, targetBoard) => {
 
   /**
    * Launches a missile towards a random tile on the target board.
+   * 
+   * @returns The x- and y-coordinates of the AI's move.
    */
   const aiMove = () => {
     let x = Math.floor(Math.random() * 9);
     let y = Math.floor(Math.random() * 9);
 
-    while (!makeMove(x, y));
+    while (!makeMove(x, y)) {
+      x = Math.floor(Math.random() * 9);
+      y = Math.floor(Math.random() * 9);
+    }
+
+    return {
+      x: x,
+      y: y
+    };
   };
 
   /**
@@ -37,7 +47,6 @@ const Player = (shipBoard, targetBoard) => {
 
     while (placedShips !== 5) {
       let ships = getShipBoard().createShips();
-      console.log(ships);
 
       for (let i = 0; i < ships.length; i++) {
         let shipPlaced = false;
