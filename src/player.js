@@ -1,8 +1,14 @@
 const { shipPlacement } = require("./ship");
 
 const Player = (shipBoard, targetBoard) => {
+  let wonGame = false;
+
   const getShipBoard = () => shipBoard;
   const getTargetBoard = () => targetBoard;
+  
+  const isWinner = () => wonGame;
+
+  const setWinner = (value) => wonGame = value;
 
   /**
    * Launches a missile towards the specified coordinates on the target board.
@@ -24,12 +30,12 @@ const Player = (shipBoard, targetBoard) => {
    * @returns The x- and y-coordinates of the AI's move.
    */
   const aiMove = () => {
-    let x = Math.floor(Math.random() * 9);
-    let y = Math.floor(Math.random() * 9);
+    let x = Math.floor(Math.random() * 10);
+    let y = Math.floor(Math.random() * 10);
 
     while (!makeMove(x, y)) {
-      x = Math.floor(Math.random() * 9);
-      y = Math.floor(Math.random() * 9);
+      x = Math.floor(Math.random() * 10);
+      y = Math.floor(Math.random() * 10);
     }
 
     return {
@@ -52,9 +58,9 @@ const Player = (shipBoard, targetBoard) => {
         let shipPlaced = false;
 
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-          let x = Math.floor(Math.random() * 9);
-          let y = Math.floor(Math.random() * 9);
-          let placement = Math.floor(Math.random() * 9) >= 5 ? shipPlacement.HORIZONTAL
+          let x = Math.floor(Math.random() * 10);
+          let y = Math.floor(Math.random() * 10);
+          let placement = Math.floor(Math.random() * 10) >= 5 ? shipPlacement.HORIZONTAL
                                                              : shipPlacement.VERTICAL;
 
           ships[i].obj.setX(x);
@@ -81,6 +87,8 @@ const Player = (shipBoard, targetBoard) => {
   return {
     getShipBoard,
     getTargetBoard,
+    isWinner,
+    setWinner,
     makeMove,
     aiMove,
     aiPlaceShips

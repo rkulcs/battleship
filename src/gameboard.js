@@ -142,6 +142,40 @@ const GameBoard = () => {
     return true;
   };
 
+  /**
+   * Updates the given tile on the target game board.
+   * 
+   * @param {HTMLElement} tile The tile to update
+   * @param {number} x The x-coordinate of the tile
+   * @param {number} y The y-coordinate of the tile
+   */
+  const updateTargetBoardTile = (tile, x, y) => {
+    tile.classList.remove('active-tile');
+      
+    if (strike(x, y)) {
+      tile.classList.add('ship-tile');
+    } else {
+      tile.classList.add('shipless-tile');
+    }
+  };
+
+  /**
+   * Makes an AI move and updates the corresponding tile on the ship game board.
+   * 
+   * @param {Player} ai The Player instance representing the AI
+   * @param {Player} player The Player instance representing the user
+   * @param {HTMLElement[][]} playerTiles The tiles of the ship game board
+   */
+  const updateShipBoardTile = (ai, player, playerTiles) => {
+    let aiCoords = ai.aiMove();
+
+    if (player.getShipBoard().strike(aiCoords.x, aiCoords.y)) {
+      playerTiles[aiCoords.y][aiCoords.x].classList.add('ship-tile');
+    } else {
+      playerTiles[aiCoords.y][aiCoords.x].classList.add('shipless-tile');
+    }
+  };
+
 
   /**
    * Sets up the event listeners of the tiles of the target board.
@@ -158,21 +192,16 @@ const GameBoard = () => {
 
         tile.addEventListener('click', () => {
           if (!tile.classList.contains('active-tile')) return;
-  
-          tile.classList.remove('active-tile');
-      
-          if (strike(x, y)) {
-            tile.classList.add('ship-tile');
-          } else {
-            tile.classList.add('shipless-tile');
-          }
 
-          let aiCoords = ai.aiMove();
-
-          if (player.getShipBoard().strike(aiCoords.x, aiCoords.y)) {
-            playerTiles[aiCoords.y][aiCoords.x].classList.add('ship-tile');
-          } else {
-            playerTiles[aiCoords.y][aiCoords.x].classList.add('shipless-tile');
+          updateTargetBoardTile(tile, x, y);
+          updateShipBoardTile(ai, player, playerTiles);
+          
+          if (ai.getShipBoard().allShipsSunk()) {
+            player.setWinner(true);
+            player.getTargetBoard().deactivateTiles(aiTiles);
+          } else if (player.getShipBoard().allShipsSunk()) {
+            ai.setWinner(true);
+            player.getTargetBoard().deactivateTiles(aiTiles);
           }
         });
       }
