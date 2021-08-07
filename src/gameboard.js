@@ -1,4 +1,5 @@
 const ship = require('./ship');
+const updateStatus = require('./status');
 
 const SIZE = 10;
 
@@ -199,9 +200,11 @@ const GameBoard = () => {
           if (ai.getShipBoard().allShipsSunk()) {
             player.setWinner(true);
             player.getTargetBoard().deactivateTiles(aiTiles);
+            updateStatus('You win.');
           } else if (player.getShipBoard().allShipsSunk()) {
             ai.setWinner(true);
             player.getTargetBoard().deactivateTiles(aiTiles);
+            updateStatus('AI wins.');
           }
         });
       }
@@ -292,8 +295,12 @@ const GameBoard = () => {
    * @param {Ship} shipsRemaining The ships to be added to the game board
    */
   const setShipPlacementEventListeners = (boardTiles, shipsRemaining) => {
-    let currentShip = shipsRemaining.pop().obj;
+    let firstShip = shipsRemaining.pop();
+    let currentShip = firstShip.obj;
     let occupiedTiles;
+
+    updateStatus(`Place your ${firstShip.name} on the board. 
+                  Press space to change its orientation.`);
 
     // Change the orientation of the ship when the spacebar is pressed
     window.addEventListener('keypress', (e) => {
@@ -321,11 +328,15 @@ const GameBoard = () => {
           currentShip.renderPermanently(boardTiles);
           
           if (shipsRemaining.length !== 0) {
-            currentShip = shipsRemaining.pop().obj;
+            let newShip = shipsRemaining.pop();
+            updateStatus(`Place your ${newShip.name} on the board. 
+                          Press space to change its orientation.`);
+            currentShip = newShip.obj;
             currentShip.setX(x);
             currentShip.setY(y);
           } else {
             currentShip = undefined;
+            updateStatus('');
             deactivateTiles(boardTiles);
           }
         });

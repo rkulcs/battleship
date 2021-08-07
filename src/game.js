@@ -1,6 +1,7 @@
 const GameBoard = require('./gameboard');
 const Player = require('./player');
 const ship = require('./ship');
+const updateStatus = require('./status');
 
 /**
  * Initializes the player and AI's boards.

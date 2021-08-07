@@ -8,6 +8,19 @@ body {
     margin: 0 auto;
 }
 
+#status {
+    margin: 0 auto;
+    margin-top: 2vh;
+    width: 70vw;
+    height: 10vh;
+    background-color: rgb(73, 93, 117);
+    border-radius: 1%;
+
+    color: rgb(201, 223, 252);
+    text-align: center;
+    font-size: 4vh;
+}
+
 #game {
     display: grid;
     grid-template-columns: 1fr 1fr;
