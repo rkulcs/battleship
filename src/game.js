@@ -30,14 +30,14 @@ const gameLoop = () => {
 
   const playerTiles = playerBoard.render(document.getElementById('ship-board'));
   const aiTiles = aiBoard.render(document.getElementById('target-board'));
-  aiBoard.deactivateTiles(aiTiles);
 
-  playerBoard.renderShipPlacement(playerTiles);
+  aiBoard.deactivateTiles(aiTiles);
+  
+  playerBoard.renderShipPlacement(playerTiles, aiTiles);
 
   ai.aiPlaceShips();
 
   aiBoard.setTargetBoardTiles(aiTiles, playerTiles, ai, player);
-  aiBoard.activateTiles(aiTiles);
 };
 
 module.exports = gameLoop;

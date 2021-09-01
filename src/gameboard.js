@@ -292,9 +292,10 @@ const GameBoard = () => {
    * 
    * @param {HTMLElement[][]} boardTiles The tiles to which the event listeners
    *                                   will be added
+   * @param {HTMLElement[][]} aiTiles The tiles of the AI's ship board
    * @param {Ship} shipsRemaining The ships to be added to the game board
    */
-  const setShipPlacementEventListeners = (boardTiles, shipsRemaining) => {
+  const setShipPlacementEventListeners = (boardTiles, aiTiles, shipsRemaining) => {
     let firstShip = shipsRemaining.pop();
     let currentShip = firstShip.obj;
     let occupiedTiles;
@@ -338,6 +339,7 @@ const GameBoard = () => {
             currentShip = undefined;
             updateStatus('');
             deactivateTiles(boardTiles);
+            activateTiles(aiTiles);
           }
         });
       }
@@ -349,8 +351,8 @@ const GameBoard = () => {
    * the board.
    * @param {HTMLElement[][]} boardTiles The tiles of the game board
    */
-  const renderShipPlacement = (boardTiles) => {
-    setShipPlacementEventListeners(boardTiles, createShips());
+  const renderShipPlacement = (boardTiles, aiTiles) => {
+    setShipPlacementEventListeners(boardTiles, aiTiles, createShips());
   };
 
   return {
